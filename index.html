@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>To Do List</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+    }
+    h1 {
+      text-align: center;
+      color: #333;
+    }
+    table {
+      border-collapse: collapse;
+      width: 50%;
+      margin: 0 auto;
+    }
+    th {
+      padding: 10px;
+      border: 1px solid #333;
+      background-color: #f44336;
+      color: white;
+      text-align: center;
+    }
+    td {
+      padding: 10px;
+      border: 1px solid #333;
+      text-align: center;
+    }
+    button {
+      padding: 5px 10px;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #45a049;
+    }
+  </style>
+</head>
+<body>
+
+<h1>To Do List</h1>
+
+<table id="todoTable">
+  <tr>
+    <th colspan="3" style="padding: 5px; background-color: #f44336; color: white; text-align: center;"><h2 style="margin: 0; font-size: 20px;">Add Tasks</h2></th>
+  </tr>
+  <tr>
+    <td><input type="text" id="taskInput1" placeholder="Enter task"></td>
+    <td><button onclick="addTask()">Add</button></td>
+    <td colspan="2"></td>
+  </tr>
+  <!-- Add more tasks here -->
+</table>
+
+<table id="taskList" style="border-collapse: collapse; width: 50%; margin: 20px auto;">
+  <!-- Task rows will be dynamically added here -->
+</table>
+
+<table id="currentTasks" style="border-collapse: collapse; width: 50%; margin: 20px auto;">
+  <tr>
+    <th colspan="2" style="padding: 5px; background-color: #f44336; color: white; text-align: center;"><h2 style="margin: 0; font-size: 20px;">Current Tasks</h2></th>
+  </tr>
+  <!-- Current task rows will be dynamically added here -->
+</table>
+
+<script>
+  // Load tasks from localStorage on page load
+  window.onload = function() {
+    var savedTasks = JSON.parse(localStorage.getItem("tasks")) || [];
+    savedTasks.forEach(function(task) {
+      addTaskToTable(task);
+    });
+  };
+
+  function addTask() {
+    var input = document.getElementById("taskInput1");
+    var taskDescription = input.value.trim();
+    if (taskDescription !== "") {
+      addTaskToTable(taskDescription);
+      saveTasksToLocalStorage();
+      input.value = ""; // Clear input field
+    } else {
+      alert("Please enter a task description.");
+    }
+  }
+
+  function addTaskToTable(taskDescription) {
+    var table = document.getElementById("taskList");
+    var newRow = table.insertRow(table.rows.length);
+    var cell1 = newRow.insertCell(0);
+    var cell2 = newRow.insertCell(1);
+    cell1.innerHTML = taskDescription;
+    cell2.innerHTML = '<button onclick="startTask(this)">Start Task</button>';
+  }
+
+  function startTask(button) {
+    var row = button.parentNode.parentNode;
+    var taskDescription = row.getElementsByTagName("td")[0].innerHTML;
+    var currentTable = document.getElementById("currentTasks");
+    var newRow = currentTable.insertRow(currentTable.rows.length);
+    var cell1 = newRow.insertCell(0);
+    var cell2 = newRow.insertCell(1);
+    cell1.innerHTML = taskDescription;
+    cell2.innerHTML = '<button onclick="completeTask(this)">Complete</button>';
+    row.parentNode.removeChild(row);
+    saveTasksToLocalStorage();
+  }
+
+  function completeTask(button) {
+    var row = button.parentNode.parentNode;
+    row.parentNode.removeChild(row);
+    saveTasksToLocalStorage();
+  }
+
+  function saveTasksToLocalStorage() {
+    var tasks = [];
+    var rows = document.getElementById("taskList").getElementsByTagName("tr");
+    for (var i = 0; i < rows.length; i++) {
+      tasks.push(rows[i].getElementsByTagName("td")[0].innerHTML);
+    }
+    localStorage.setItem("tasks", JSON.stringify(tasks));
+  }
+</script>
+
+</body>
+</html>
